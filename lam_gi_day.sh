@@ -129,10 +129,15 @@ restore_sequence() {
     log_message "🎉 Quá trình restore sequence hoàn tất!"
 }
 
-# Thực thi các hàm
-# check_db_connection
-get_tables_list
-restore_schema
-restore_tables 
-# get_sequences_list
-# restore_sequence
+main() {
+    check_db_connection
+
+    get_tables_list
+    restore_schema
+    restore_tables 
+
+    get_sequences_list
+    restore_sequence
+}
+
+main
