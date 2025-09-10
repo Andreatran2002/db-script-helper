@@ -13,7 +13,7 @@ PORT="${PORT:-5432}"
 # Tên database cần restore
 DB_NAME="${DB_NAME:-postgres}"
 
-SLEEP_TIME=1
+SLEEP_TIME=5
 
 # Danh sách các bảng cần skip
 SKIP_TABLES=()
@@ -69,7 +69,7 @@ is_table_skipped() {
 
 restore_schema() {
     log_message "🔄 Đang restore schema..."
-    PGPASSWORD="$PGPASSWORD" pg_restore -d "$DB_NAME" -U $USER -h $HOST -p $PORT -Fd "$BACKUP_DIR" --schema-only
+    PGPASSWORD="$PGPASSWORD" pg_restore -d "$DB_NAME" -U $USER -h $HOST -p $PORT -Fd "$BACKUP_DIR" --schema-only --no-owner --no-privileges
     log_message "🎉 Restore schema hoàn tất!"
     sleep $SLEEP_TIME
 }
@@ -86,7 +86,7 @@ restore_tables() {
             continue
         fi
         log_message "⏳ Đang restore bảng: $TABLE ..."
-        PGPASSWORD="$PGPASSWORD" pg_restore -d "$DB_NAME" -U $USER -h $HOST -p $PORT -Fd "$BACKUP_DIR" --table="$TABLE" --disable-triggers --data-only
+        PGPASSWORD="$PGPASSWORD" pg_restore -d "$DB_NAME" -U $USER -h $HOST -p $PORT -Fd "$BACKUP_DIR" --table="$TABLE" --disable-triggers --data-only --no-owner --no-privileges
         
         if [ $? -eq 0 ]; then
             restored_count=$((restored_count + 1))
@@ -130,9 +130,9 @@ restore_sequence() {
 }
 
 # Thực thi các hàm
-check_db_connection
-# get_tables_list
-# restore_schema
-# restore_tables 
-get_sequences_list
-restore_sequence
+# check_db_connection
+get_tables_list
+restore_schema
+restore_tables 
+# get_sequences_list
+# restore_sequence
